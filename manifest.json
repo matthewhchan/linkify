@@ -1,0 +1,10 @@
+{
+	"id": "linkfy",
+	"name": "Linkify",
+	"version": "1.0.0",
+	"minAppVersion": "0.10.13",
+	"description": "Turn strings into links.",
+	"author": "matthewhchan",
+	"authorUrl": "",
+	"isDesktopOnly": false
+}
