@@ -4,7 +4,7 @@ import {
   Plugin,
 } from 'obsidian';
 
-const linkRegex = /\w+\/[\w\d-#]+/;
+const linkRegex = /\w+\/[\w\d-#./]+/;
 
 function linkify(text: string): (string|Node)[] {
   let match = text.match(linkRegex);
