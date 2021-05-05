@@ -4,20 +4,44 @@ import {
   Plugin,
 } from 'obsidian';
 
-const linkRegex = /\w+\/[\w\d-#./]+/;
+const linkRules = [
+  {
+    regex : /(?<!\S)\w\w?\/[\w\d-#\/.]*[\w\d-#\/]+(?!\S)/,
+    href : (match) => { return 'http://' + match[0]; },
+  },
+  {
+    regex : /(?<!\S)([a-z]+)@(?!\S)/,
+    href : (match) => { return 'mailto:' + match[1]; },
+  }
+];
+
+function matchLinkRules(text: string):
+    {text: string, href: string, index: number}|null {
+  for (var rule of linkRules) {
+    let match = text.match(rule.regex);
+    if (match) {
+      return {
+        text : match[0],
+        href : rule.href(match),
+        index : match.index,
+      };
+    }
+  }
+
+  return null;
+}
 
 function linkify(text: string): (string|Node)[] {
-  let match = text.match(linkRegex);
-  if (match) {
-    let before = text.substr(0, match.index);
-    let link = document.createElement("a");
-    link.href = 'http://' + match[0];
-    link.textContent = match[0];
-    let after = text.substr(match.index + match[0].length);
-
+  let link = matchLinkRules(text);
+  if (link != null) {
+    let before = text.substr(0, link.index);
+    let after = text.substr(link.index + link.text.length);
+    let anchor = document.createElement("a");
+    anchor.textContent = link.text;
+    anchor.href = link.href;
     let nodes: (string|Node)[] = [];
     nodes.push(before);
-    nodes.push(link);
+    nodes.push(anchor);
     nodes.push(...(linkify(after) || [ after ]));
     return nodes;
   }
@@ -27,7 +51,7 @@ function linkify(text: string): (string|Node)[] {
 
 export default class Linkify extends Plugin {
   async onload() {
-    // Render matching strings as links in preview.
+    // Render matching strings as links in PREVIEW.
     this.registerMarkdownPostProcessor((el: HTMLElement,
                                         ctx: MarkdownPostProcessorContext) => {
       let walker = document.createTreeWalker(el.firstChild,
@@ -46,19 +70,26 @@ export default class Linkify extends Plugin {
       }
     });
 
-    // Style matching strings in source as links.
+    // Style matching strings in SOURCE as links.
     this.registerCodeMirror((cm: CodeMirror.Editor) => {
       cm.addOverlay({
         token : (stream) => {
-          if (stream.match(linkRegex)) {
-            return "url";
+          for (var rule of linkRules) {
+            if (stream.match(rule.regex)) {
+              return "url";
+            };
           }
-          stream.next();
+
+          // Skip ahead to the next space or the end of line.
+          // Otherwise, advance one character.
+          if (!stream.match(/\S+(?!\S)/)) {
+            stream.next();
+          }
         }
       });
     });
 
-    // Cmd-Click on matching strings in source to open link.
+    // Cmd-Click on matching strings in SOURCE to open link.
     this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
       if (evt.metaKey) {
         let view = this ?.app ?.workspace ?.activeLeaf ?.view;
@@ -66,14 +97,12 @@ export default class Linkify extends Plugin {
           let editor = view.sourceMode.cmEditor;
           let cursor = editor.getCursor();
           let token = editor.getTokenAt(cursor);
-          let match = token.string.match(linkRegex);
-          if (match) {
-            window.open('http://' + match[0]);
+          let link = matchLinkRules(token.string);
+          if (link != null) {
+            window.open(link.href);
           }
         }
       }
     });
   }
-
-  // TODO: Unregister callbacks.
 }
