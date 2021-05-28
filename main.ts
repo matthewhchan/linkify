@@ -90,19 +90,21 @@ export default class Linkify extends Plugin {
     });
 
     // Cmd-Click on matching strings in SOURCE to open link.
-    this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-      if (evt.metaKey) {
-        let view = this ?.app ?.workspace ?.activeLeaf ?.view;
-        if (view instanceof MarkdownView) {
-          let editor = view.sourceMode.cmEditor;
-          let cursor = editor.getCursor();
-          let token = editor.getTokenAt(cursor);
-          let link = matchLinkRules(token.string);
-          if (link != null) {
-            window.open(link.href);
+    this.registerCodeMirror(
+        (cm: CodeMirror.Editor) => {cm.on("mousedown", (instance, evt) => {
+          if (!evt.metaKey) {
+            return;
           }
-        }
-      }
-    });
+          let view = this ?.app ?.workspace ?.activeLeaf ?.view;
+          if (view instanceof MarkdownView) {
+            let editor = view.sourceMode.cmEditor;
+            let cursor = editor.getCursor();
+            let token = editor.getTokenAt(cursor);
+            let link = matchLinkRules(token.string);
+            if (link != null) {
+              window.open(link.href);
+            }
+          }
+        })});
   }
 }
