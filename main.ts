@@ -33,42 +33,44 @@ function matchLinkRules(text: string):
 
 function linkify(text: string): (string|Node)[] {
   let link = matchLinkRules(text);
-  if (link != null) {
-    let before = text.substr(0, link.index);
-    let after = text.substr(link.index + link.text.length);
-    let anchor = document.createElement("a");
-    anchor.textContent = link.text;
-    anchor.href = link.href;
-    let nodes: (string|Node)[] = [];
-    nodes.push(before);
-    nodes.push(anchor);
-    nodes.push(...(linkify(after) || [ after ]));
-    return nodes;
+  if (link == null) {
+    return null;
   }
 
-  return null;
+  let before = text.substr(0, link.index);
+  let after = text.substr(link.index + link.text.length);
+  let anchor = document.createElement("a");
+  anchor.textContent = link.text;
+  anchor.href = link.href;
+  let nodes: (string|Node)[] = [];
+  nodes.push(before);
+  nodes.push(anchor);
+  nodes.push(...(linkify(after) || [ after ]));
+  return nodes;
 }
 
 export default class Linkify extends Plugin {
   async onload() {
     // Render matching strings as links in PREVIEW.
-    this.registerMarkdownPostProcessor((el: HTMLElement,
-                                        ctx: MarkdownPostProcessorContext) => {
-      let walker = document.createTreeWalker(el.firstChild,
-                                             NodeFilter.SHOW_TEXT, null, false);
-      let nodes: ChildNode[] = [];
-      let node;
-      while (node = walker.nextNode()) {
-        nodes.push(node);
-      }
+    this.registerMarkdownPostProcessor(
+        (el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
+          if (el.firstChild instanceof Node) {
+            let walker = document.createTreeWalker(
+                el.firstChild, NodeFilter.SHOW_TEXT, null, false);
+            let nodes: ChildNode[] = [];
+            let node;
+            while (node = walker.nextNode()) {
+              nodes.push(node);
+            }
 
-      for (node of nodes) {
-        let linkified = linkify(node.textContent);
-        if (linkified) {
-          node.replaceWith(...linkified);
-        }
-      }
-    });
+            for (node of nodes) {
+              let linkified = linkify(node.textContent);
+              if (linkified) {
+                node.replaceWith(...linkified);
+              }
+            }
+          }
+        });
 
     // Style matching strings in SOURCE as links.
     this.registerCodeMirror((cm: CodeMirror.Editor) => {
@@ -76,35 +78,28 @@ export default class Linkify extends Plugin {
         token : (stream) => {
           for (var rule of linkRules) {
             if (stream.match(rule.regex)) {
-              return "url";
+              return "hmd-internal-link";
             };
           }
 
-          // Skip ahead to the next space or the end of line.
-          // Otherwise, advance one character.
-          if (!stream.match(/\S+(?!\S)/)) {
+          if (!stream.match(/\S+?\b/)) {
             stream.next();
           }
         }
       });
     });
 
-    // Cmd-Click on matching strings in SOURCE to open link.
-    this.registerCodeMirror(
-        (cm: CodeMirror.Editor) => {cm.on("mousedown", (instance, evt) => {
-          if (!evt.metaKey) {
-            return;
+    // Cmd-Click or Middle Click on matching strings in SOURCE to open link.
+    this.registerCodeMirror((cm: CodeMirror.Editor) => {
+      cm.on("mousedown", (instance, evt) => {
+        if ((evt.metaKey || evt.button == 1) && evt.target instanceof
+                                                    HTMLElement) {
+          let link = matchLinkRules(evt.target.innerText);
+          if (link != null && link.index == 0) {
+            window.open(link.href);
           }
-          let view = this ?.app ?.workspace ?.activeLeaf ?.view;
-          if (view instanceof MarkdownView) {
-            let editor = view.sourceMode.cmEditor;
-            let cursor = editor.getCursor();
-            let token = editor.getTokenAt(cursor);
-            let link = matchLinkRules(token.string);
-            if (link != null) {
-              window.open(link.href);
-            }
-          }
-        })});
+        }
+      });
+    });
   }
 }
