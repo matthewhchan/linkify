@@ -78,7 +78,11 @@ export default class Linkify extends Plugin {
         token : (stream) => {
           for (var rule of linkRules) {
             if (stream.match(rule.regex)) {
-              return "hmd-internal-link";
+              let baseToken = stream.baseToken();
+              if (baseToken == null || baseToken.type == null ||
+                  !baseToken.type.includes('url')) {
+                return "hmd-internal-link";
+              }
             };
           }
 
