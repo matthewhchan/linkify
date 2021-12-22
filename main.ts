@@ -50,14 +50,14 @@ function linkify(text: string): (string | Node)[] {
 
 export default class Linkify extends Plugin {
   async onload() {
-    // Render matching strings as links in PREVIEW.
+    // PREVIEW MODE: Render matching strings as links.
     this.registerMarkdownPostProcessor(
       (el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
         if (el.firstChild instanceof Node) {
           let walker = document.createTreeWalker(
-            el.firstChild, NodeFilter.SHOW_TEXT, null, false);
-          let nodes: ChildNode[] = [];
-          let node;
+            el.firstChild, NodeFilter.SHOW_TEXT, null);
+          let nodes: Node[] = [];
+          let node: Node;
           while (node = walker.nextNode()) {
             nodes.push(node);
           }
@@ -65,16 +65,16 @@ export default class Linkify extends Plugin {
           for (node of nodes) {
             let linkified = linkify(node.textContent);
             if (linkified) {
-              node.replaceWith(...linkified);
+              (<Element>node).replaceWith(...linkified);
             }
           }
         }
       });
 
-    // Style matching strings in SOURCE as links.
+    // SOURCE MODE: Convert matching strings to links.
     this.registerCodeMirror((cm: CodeMirror.Editor) => {
       cm.addOverlay({
-        token: (stream) => {
+        token: (stream: { match: (arg0: RegExp) => any; baseToken: () => any; next: () => void; }) => {
           for (var rule of linkRules) {
             if (stream.match(rule.regex)) {
               let baseToken = stream.baseToken();
