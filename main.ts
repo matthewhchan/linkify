@@ -167,7 +167,7 @@ class LinkifySettingTab extends PluginSettingTab {
 	display(): void {
 		const { containerEl } = this;
 		containerEl.empty();
-		containerEl.createEl('p', { text: 'Text matching the following regular expressions will be turned into links.' });
+		containerEl.createEl('p', { text: 'Text matching the following regular expressions will be converted into links.' });
 
 		for (let [index, rule] of this.plugin.settings.rules.entries()) {
 			new Setting(containerEl)

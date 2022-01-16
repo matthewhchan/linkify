@@ -1,2 +1,2 @@
 # Linkify
-Turns strings matching regular expressions into links.
+Converts text matching regular expressions into links.
