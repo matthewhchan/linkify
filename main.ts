@@ -2,31 +2,40 @@ import { App, ButtonComponent, Plugin, PluginSettingTab, Setting } from 'obsidia
 import { Decoration, MatchDecorator, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { RangeSet } from "@codemirror/rangeset";
 
-interface LinkifySettings {
-	rules: {
-		regexp: string,
-		link: string,
-	}[];
+interface LinkifyRule {
+	regexp: string,
+	link: string,
 }
+
+interface LinkifySettings {
+	rules: LinkifyRule[];
+}
+
+type LinkifyViewPlugin = ViewPlugin<{
+	decorations: RangeSet<Decoration>;
+	update(u: ViewUpdate): void;
+}>;
 
 const DEFAULT_SETTINGS: LinkifySettings = {
 	rules: [
 		{
 			regexp: "g\\/([a-zA-Z.-]*)",
-			link: "http://google.com/search?q=$1"
+			link: "http://google.com/search?q=$1",
 		},
 		{
 			regexp: "@([a-zA-Z]*)",
-			link: "http://twitter.com/$1"
+			link: "http://twitter.com/$1",
 		},
 	]
 }
 
-// Creates a ViewPlugin from a rule. 
-function createViewPlugin(rule: { regexp: string, link: string }): ViewPlugin<{
-	decorations: RangeSet<Decoration>;
-	update(u: ViewUpdate): void;
-}> {
+const DEFAULT_NEW_RULE = {
+	regexp: "g\\/([a-zA-Z.-]*)",
+	link: "http://google.com/search?q=$1",
+}
+
+// Creates a ViewPlugin from a LinkifyRule.
+function createViewPlugin(rule: LinkifyRule): LinkifyViewPlugin {
 	let decorator = new MatchDecorator({
 		regexp: new RegExp(rule.regexp, "g"),
 		decoration: Decoration.mark({ class: "cm-link linkified" }),
@@ -41,30 +50,23 @@ function createViewPlugin(rule: { regexp: string, link: string }): ViewPlugin<{
 
 export default class Linkify extends Plugin {
 	settings: LinkifySettings;
+	viewPlugins: LinkifyViewPlugin[] = [];
 
 	async onload() {
-		// Settings
+		// Load settings.
 		await this.loadSettings();
+
+		// Create settings tab.
 		this.addSettingTab(new LinkifySettingTab(this.app, this));
 
 		// Linkify Live Preview mode.
-		this.settings.rules.map(createViewPlugin).forEach((plugin) => { this.registerEditorExtension(plugin); });
+		this.refreshExtensions();
 
 		// Linkify Reading mode.
-		this.registerMarkdownPostProcessor(this.markdownProcessor.bind(this));
+		this.registerMarkdownPostProcessor(this.markdownPostProcessor.bind(this));
 
 		// Cmd or middle click on linkified text to open the link.
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			if ((evt.metaKey || evt.button == 1) &&
-				evt.target instanceof HTMLSpanElement &&
-				evt.target.className == "cm-link linkified") {
-				let m = this.matchRule(evt.target.innerText);
-				if (m != null) {
-					window.open(m.link);
-				}
-			}
-		});
-
+		this.registerDomEvent(document, 'click', this.openLink.bind(this));
 	}
 
 	async loadSettings() {
@@ -73,6 +75,26 @@ export default class Linkify extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+	}
+
+	// Unregisters any existing LinkifyPlugins and registers new ones constructed from the rules.
+	refreshExtensions() {
+		// Note: unregisterEditorExtension is not part of the public API.
+		this.viewPlugins.forEach((plugin) => { this.app.workspace.unregisterEditorExtension(plugin); });
+		this.viewPlugins = this.settings.rules.map(createViewPlugin);
+		this.viewPlugins.forEach((plugin) => { this.registerEditorExtension(plugin); });
+	}
+
+	// Opens linkified text as a link.
+	openLink(evt: MouseEvent) {
+		if ((evt.metaKey || evt.button == 1) &&
+			evt.target instanceof HTMLSpanElement &&
+			evt.target.className == "cm-link linkified") {
+			let m = this.matchRule(evt.target.innerText);
+			if (m != null) {
+				window.open(m.link);
+			}
+		}
 	}
 
 	// Returns the RegExp match and link for the given text.
@@ -91,8 +113,8 @@ export default class Linkify extends Plugin {
 		return null;
 	}
 
-	// Replaces matching text with a link.
-	linkify(text: string): (string | Node)[] {
+	// Replaces matching text with an anchor.
+	linkifyHtml(text: string): (string | Node)[] {
 		let m = this.matchRule(text);
 		if (m == null) {
 			return null;
@@ -108,11 +130,12 @@ export default class Linkify extends Plugin {
 		let nodes: (string | Node)[] = [];
 		nodes.push(before);
 		nodes.push(anchor);
-		nodes.push(...(this.linkify(after) || [after]));
+		nodes.push(...(this.linkifyHtml(after) || [after]));
 		return nodes;
 	}
 
-	markdownProcessor(el: HTMLElement) {
+	// Converts matching text in the HTMLElement into links.
+	markdownPostProcessor(el: HTMLElement) {
 		if (el.firstChild instanceof Node) {
 			let walker = document.createTreeWalker(
 				el.firstChild, NodeFilter.SHOW_TEXT, null);
@@ -123,7 +146,7 @@ export default class Linkify extends Plugin {
 			}
 
 			for (node of nodes) {
-				let linkified = this.linkify(node.textContent);
+				let linkified = this.linkifyHtml(node.textContent);
 				if (linkified) {
 					(<Element>node).replaceWith(...linkified);
 				}
@@ -144,26 +167,28 @@ class LinkifySettingTab extends PluginSettingTab {
 	display(): void {
 		const { containerEl } = this;
 		containerEl.empty();
-		containerEl.createEl('p', { text: 'Strings matching the following regular expressions will be turned into links.' });
+		containerEl.createEl('p', { text: 'Text matching the following regular expressions will be turned into links.' });
 
 		for (let [index, rule] of this.plugin.settings.rules.entries()) {
 			new Setting(containerEl)
 				.setDesc("RegExp/Link")
-				.addText(text => text
-					.setValue(rule.regexp)
-					.onChange(async (value) => {
-						rule.regexp = value;
+				.addText(text => {
+					text.setValue(rule.regexp)
+					text.inputEl.onblur = async () => {
+						rule.regexp = text.getValue();
 						await this.plugin.saveSettings();
-					}))
-				.addText(text => text
-					.setValue(rule.link)
-					.onChange(async (value) => {
-						rule.link = value;
+					};
+				})
+				.addText(text => {
+					text.setValue(rule.link);
+					text.inputEl.onblur = async () => {
+						rule.link = text.getValue();
 						await this.plugin.saveSettings();
-					}))
-				.addButton((button: ButtonComponent) => {
+					};
+				})
+				.addButton(button => {
 					return button
-						.setButtonText("-")
+						.setIcon("trash")
 						.onClick(async () => {
 							this.plugin.settings.rules.splice(index, 1);
 							await this.plugin.saveSettings();
@@ -172,25 +197,16 @@ class LinkifySettingTab extends PluginSettingTab {
 				});
 		}
 
-		containerEl.createEl('div', {
-			cls: 'setting-item',
-		});
-		containerEl.createEl('button', {
-			text: "+",
-		}).onclick = async () => {
-			this.plugin.settings.rules.push({
-				regexp: "link:([a-zA-Z.-]+)",
-				link: "http://$1",
-			})
-			await this.plugin.saveSettings();
-			this.display();
-		}
-		containerEl.createDiv({
-			text: "Changes require a restart to take effect in Live Preview.",
-			cls: 'setting-item-description',
-			attr: {
-				style: 'margin-top: 26px',
-			}
-		});
+		new Setting(containerEl)
+			.addButton((button) => button
+				.setButtonText("Add New Link").onClick(async () => {
+					this.plugin.settings.rules.push(DEFAULT_NEW_RULE);
+					await this.plugin.saveSettings();
+					this.display();
+				}));
+	}
+
+	hide() {
+		this.plugin.refreshExtensions();
 	}
 }
