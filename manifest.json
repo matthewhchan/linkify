@@ -1,9 +1,9 @@
 {
 	"id": "linkify",
 	"name": "Linkify",
-	"version": "1.0.2",
-	"minAppVersion": "0.10.13",
-	"description": "Turn strings into links.",
+	"version": "1.0.3",
+	"minAppVersion": "0.13.0",
+	"description": "Turns strings into links.",
 	"author": "matthewhchan",
 	"authorUrl": "",
 	"isDesktopOnly": false
