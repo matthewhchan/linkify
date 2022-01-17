@@ -51,6 +51,7 @@ function createViewPlugin(rule: LinkifyRule): LinkifyViewPlugin {
 export default class Linkify extends Plugin {
 	settings: LinkifySettings;
 	viewPlugins: LinkifyViewPlugin[] = [];
+	cmdClick: boolean;
 
 	async onload() {
 		// Load settings.
@@ -65,7 +66,8 @@ export default class Linkify extends Plugin {
 		// Linkify Reading mode.
 		this.registerMarkdownPostProcessor(this.markdownPostProcessor.bind(this));
 
-		// Cmd or middle click on linkified text to open the link.
+		// Cmd/Ctrl + click or middle click on linkified text to open the link.
+		this.cmdClick = navigator.platform.startsWith("Mac");
 		this.registerDomEvent(document, 'click', this.openLink.bind(this));
 	}
 
@@ -79,15 +81,15 @@ export default class Linkify extends Plugin {
 
 	// Unregisters any existing LinkifyPlugins and registers new ones constructed from the rules.
 	refreshExtensions() {
-		// Note: unregisterEditorExtension is not part of the public API.
-		this.viewPlugins.forEach((plugin) => { this.app.workspace.unregisterEditorExtension(plugin); });
+		// Note: unregisterEditorExtension is not part of the public Obsidian API.
+		this.viewPlugins.forEach((plugin) => { (<any>this.app.workspace).unregisterEditorExtension(plugin); });
 		this.viewPlugins = this.settings.rules.map(createViewPlugin);
 		this.viewPlugins.forEach((plugin) => { this.registerEditorExtension(plugin); });
 	}
 
 	// Opens linkified text as a link.
 	openLink(evt: MouseEvent) {
-		if ((evt.metaKey || evt.button == 1) &&
+		if (((this.cmdClick ? evt.metaKey : evt.ctrlKey) || evt.button == 1) &&
 			evt.target instanceof HTMLSpanElement &&
 			evt.target.className == "cm-link linkified") {
 			let m = this.matchRule(evt.target.innerText);
