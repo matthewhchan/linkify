@@ -68,7 +68,16 @@ export default class Linkify extends Plugin {
 
 		// Cmd/Ctrl + click or middle click on linkified text to open the link.
 		this.cmdClick = navigator.platform.startsWith("Mac");
-		this.registerDomEvent(document, 'click', this.openLink.bind(this));
+		this.registerDomEvent(document, 'click', evt => {
+			if (this.cmdClick ? evt.metaKey : evt.ctrlKey) {
+				this.openLink(evt);
+			}
+		});
+		this.registerDomEvent(document, 'auxclick', evt => {
+			if (evt.button == 1) {
+				this.openLink(evt);
+			}
+		})
 	}
 
 	async loadSettings() {
@@ -89,8 +98,7 @@ export default class Linkify extends Plugin {
 
 	// Opens linkified text as a link.
 	openLink(evt: MouseEvent) {
-		if (((this.cmdClick ? evt.metaKey : evt.ctrlKey) || evt.button == 1) &&
-			evt.target instanceof HTMLSpanElement &&
+		if (evt.target instanceof HTMLSpanElement &&
 			evt.target.className == "cm-link linkified") {
 			let m = this.matchRule(evt.target.innerText);
 			if (m != null) {
@@ -155,6 +163,7 @@ export default class Linkify extends Plugin {
 			}
 		}
 	}
+
 
 }
 
