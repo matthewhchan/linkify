@@ -133,7 +133,7 @@ export default class Linkify extends Plugin {
 		let index = m.match.index;
 		let matched_text = m.match[0];
 		let before = text.substring(0, index);
-		let after = text.substring(index + text.length);
+		let after = text.substring(index + matched_text.length);
 		let anchor = document.createElement("a");
 		anchor.textContent = matched_text;
 		anchor.href = m.link;

@@ -1,7 +1,7 @@
 {
 	"id": "linkify",
 	"name": "Linkify",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"minAppVersion": "0.13.0",
 	"description": "Turns text into links.",
 	"author": "matthewhchan",
