@@ -1,4 +1,4 @@
-import { App, ButtonComponent, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { Decoration, MatchDecorator, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { RangeSet } from "@codemirror/rangeset";
 
@@ -131,11 +131,11 @@ export default class Linkify extends Plugin {
 		}
 
 		let index = m.match.index;
-		let matched_text = m.match[0];
+		let matchedText = m.match[0];
 		let before = text.substring(0, index);
-		let after = text.substring(index + matched_text.length);
+		let after = text.substring(index + matchedText.length);
 		let anchor = document.createElement("a");
-		anchor.textContent = matched_text;
+		anchor.textContent = matchedText;
 		anchor.href = m.link;
 		let nodes: (string | Node)[] = [];
 		nodes.push(before);
