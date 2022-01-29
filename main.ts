@@ -115,7 +115,7 @@ export default class Linkify extends Plugin {
 			if (m != null) {
 				return {
 					match: m,
-					link: text.replace(regexp, rule.link),
+					link: m[0].replace(regexp, rule.link),
 				}
 			}
 		}
