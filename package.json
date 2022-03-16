@@ -1,6 +1,6 @@
 {
 	"name": "linkify",
-	"version": "1.0.7",
+	"version": "1.0.8",
 	"description": "Turns strings into links.",
 	"main": "main.js",
 	"scripts": {

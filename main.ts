@@ -66,18 +66,10 @@ export default class Linkify extends Plugin {
 		// Linkify Reading mode.
 		this.registerMarkdownPostProcessor(this.markdownPostProcessor.bind(this));
 
-		// Cmd/Ctrl + click or middle click on linkified text to open the link.
-		this.cmdClick = navigator.platform.startsWith("Mac");
+		// Click to open the link.
 		this.registerDomEvent(document, 'click', evt => {
-			if (this.cmdClick ? evt.metaKey : evt.ctrlKey) {
-				this.openLink(evt);
-			}
+			this.openLink(evt);
 		});
-		this.registerDomEvent(document, 'auxclick', evt => {
-			if (evt.button == 1) {
-				this.openLink(evt);
-			}
-		})
 	}
 
 	async loadSettings() {
@@ -163,8 +155,6 @@ export default class Linkify extends Plugin {
 			}
 		}
 	}
-
-
 }
 
 class LinkifySettingTab extends PluginSettingTab {
