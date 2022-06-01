@@ -1,7 +1,24 @@
 # Linkify
-This plugin converts text into links based on regular expressions.
+This plugin converts text into links based on regular expressions. It will highlight matching text the same way links are and when you click on them, it will open a browser and take you to the URL.
+
+For example, you could make all text that follows the format of a Twitter handle, e.g. `@obsdmd`, link to the corresponding Twitter profile.
+
+<img width="720" alt="image" src="https://user-images.githubusercontent.com/37097379/171517773-eec42523-5fa7-43c9-aa3d-d5bc4623c36d.png">
+
+In the example in the screenshot, clicking on `@obsdmd` will open a browser to http://www.twitter.com/obsdmd.
+
+Or maybe you want to make a shortcut for GitHub repos, so that `gh:user/repo` will link to the GitHub repo for `user/repo`.
+
+<img width="719" alt="image" src="https://user-images.githubusercontent.com/37097379/171517539-52a918f4-ea89-4112-bd1c-d3aa32e6665a.png">
+
+In the example in the screenshot, clicking on `gh:obsidianmd/obsidian-releases` will open a browser to http://www.github.com/obsidianmd/obsidian-releases.
+
+The text you want to match and the URL you want it to link to are configured on the *Options* page for the plugin.
+
+Note: The underlying text is not modified. This plugin makes no changes to your `.md` files.
 
 ## How to Use
+To add a regular expression and link pair:
 - Go to the *Options* page for Linkify.
 - Click on the "Add New Link" button.
 - In the first text box, enter a regular expression.
@@ -12,9 +29,7 @@ This plugin converts text into links based on regular expressions.
 
 [^1]: The syntax for the replacment patterns follows [`String.prototype.replace`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#specifying_a_string_as_a_parameter).
 
-Now, all text that matches the regular expression will be highlighted as though they were links in *Live Preview* mode, and clicking on the text will open the link in a browser.
-
-*The underlying text is not modified. This plugin makes no changes to your `.md` files.*
+Now, any text that matches the regular expression will be highlighted as though they were links in *Live Preview* mode, and clicking on the text will open the link in a browser.
 
 For example, if the regular expression is `@(\w+)` and the link is `http://twitter.com/$1`, then any occurrence of `@obsdmd` in your notes will link to `http://twitter.com/obsdmd`, and the same is true for any other Twitter handle preceded by a `@`.
 
