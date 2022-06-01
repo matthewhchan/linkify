@@ -18,16 +18,16 @@ The text you want to match and the URL you want it to link to are configured on 
 Note: The underlying text is not modified. This plugin makes no changes to your `.md` files.
 
 ## How to Use
-To add a regular expression and link pair:
+To add a link pattern:
 - Go to the *Options* page for Linkify.
 - Click on the "Add New Link" button.
 - In the first text box, enter a regular expression.
-	- The regular expression may include capturing parentheses.
-- In the second text box, write the URL you want the text to link to.
-	- The URL may include regular expression replacement patterns (e.g. `$1`).[^1]
+- In the second text box, write the URL you want the text to link to.[^1]
 - Close the *Options* page.
 
-[^1]: The syntax for the replacment patterns follows [`String.prototype.replace`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#specifying_a_string_as_a_parameter).
+[^1]: The URL is allowed to include replacement patterns as described in [`String.prototype.replace`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#specifying_a_string_as_a_parameter).
+
+<img width="996" alt="image" src="https://user-images.githubusercontent.com/37097379/171518552-73ca93d9-2125-4c5e-bf70-ce4f9c0e95ee.png">
 
 Now, any text that matches the regular expression will be highlighted as though they were links in *Live Preview* mode, and clicking on the text will open the link in a browser.
 
