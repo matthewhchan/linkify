@@ -91,7 +91,7 @@ export default class Linkify extends Plugin {
 	// Opens linkified text as a link.
 	openLink(evt: MouseEvent) {
 		if (evt.target instanceof HTMLSpanElement &&
-			evt.target.className == "cm-link linkified") {
+			evt.target.className === "cm-link linkified") {
 			let m = this.matchRule(evt.target.innerText);
 			if (m != null) {
 				window.open(m.link);
