@@ -18,6 +18,7 @@ The text you want to match and the URL you want it to link to are configured on 
 Note: The underlying text is not modified. This plugin makes no changes to your `.md` files.
 
 ## How to Use
+### Add a Link Pattern
 To add a link pattern:
 - Go to the *Options* page for Linkify.
 - Click on the "Add New Link" button.
@@ -35,9 +36,11 @@ For example, if the regular expression is `@(\w+)` and the link is `http://twitt
 
 You can have multiple regex-link entries. Each one is applied independently.
 
+### Default Link Patterns
 By default, the plugin starts with two entries as examples:
 
 1. `g/<text>` will link to `http://google.com/search?q=<text>`
 2. `@<name>` will link to `http://twitter.com/<name>`
 
+### Delete a Link Pattern
 You can delete an entry by clicking on the trash can icon to the right of the entry.
