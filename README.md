@@ -9,7 +9,7 @@ In the example, clicking on "@obsdmd" would open a browser to http://twitter.com
 
 Or perhaps you want to make a shortcut for GitHub repos, so that clicking on "gh:user/repo" will link to the GitHub repo for `user/repo`.
 
-<img width="719" alt="image" src="https://user-images.githubusercontent.com/37097379/171517539-52a918f4-ea89-4112-bd1c-d3aa32e6665a.png">
+<img width="715" alt="image" src="https://user-images.githubusercontent.com/37097379/171542746-de76396e-c31f-41f4-a155-7510688379b5.png">
 
 In this example, clicking on "gh:obsidianmd/obsidian-releases" would open a browser to http://github.com/obsidianmd/obsidian-releases.
 
@@ -30,7 +30,7 @@ To add a link pattern:
 
 Here's what the Linkify *Options* page looks like:
 
-<img width="990" alt="image" src="https://user-images.githubusercontent.com/37097379/171541034-1f2b6630-acfb-4ebb-b535-2b68f54a0aa4.png">
+<img width="992" alt="image" src="https://user-images.githubusercontent.com/37097379/171542591-e86c5c17-b2e2-4856-8ab2-1e50062082ed.png">
 
 Now, any text that matches the regular expressions will be highlighted as though they were links in *Live Preview* mode, and clicking on the text will open the link in a browser.
 
@@ -38,11 +38,11 @@ For example, if the regular expression is `@(\w+)` and the link is `http://twitt
 
 You can have multiple regex-link entries. Each one is applied independently.
 
+### Delete a Link Pattern
+You can delete an entry by clicking on the trash can icon to the right of the entry.
+
 ### Default Link Patterns
-By default, the plugin starts with two entries as examples:
+By default, the plugin starts with two example entries:
 
 1. Text matching `g\/([a-zA-Z.-]*)` will link to `http://google.com/search?q=$1`, e.g. "g/obsidian" will search for "obsidian" on Google.
 2. Text matching `@([a-zA-Z]*)` will link to `http://twitter.com/$1`, e.g. "@obsdmd" will open the Obsidian Twitter page.
-
-### Delete a Link Pattern
-You can delete an entry by clicking on the trash can icon to the right of the entry.
