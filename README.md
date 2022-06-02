@@ -5,13 +5,13 @@ For example, you could make all text that is formatted like a Twitter handle, e.
 
 <img width="718" alt="image" src="https://user-images.githubusercontent.com/37097379/171535251-9c33087f-8f25-4a4e-8907-b819b61b6262.png">
 
-In the example, clicking on "@obsdmd" would open a browser to http://www.twitter.com/obsdmd.
+In the example, clicking on "@obsdmd" would open a browser to http://twitter.com/obsdmd.
 
 Or perhaps you want to make a shortcut for GitHub repos, so that clicking on "gh:user/repo" will link to the GitHub repo for `user/repo`.
 
 <img width="719" alt="image" src="https://user-images.githubusercontent.com/37097379/171517539-52a918f4-ea89-4112-bd1c-d3aa32e6665a.png">
 
-In this example, clicking on "gh:obsidianmd/obsidian-releases" would open a browser to http://www.github.com/obsidianmd/obsidian-releases.
+In this example, clicking on "gh:obsidianmd/obsidian-releases" would open a browser to http://github.com/obsidianmd/obsidian-releases.
 
 The text you want to match and the URL you want it to link to are configured on the *Options* page for the plugin.
 
@@ -28,8 +28,9 @@ To add a link pattern:
 
 [^1]: The URL is allowed to include replacement patterns as described in [`String.prototype.replace`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#specifying_a_string_as_a_parameter).
 
-Here is a screenshot of the Linkify *Options* page:
-<img width="996" alt="image" src="https://user-images.githubusercontent.com/37097379/171518552-73ca93d9-2125-4c5e-bf70-ce4f9c0e95ee.png">
+Here's what the Linkify *Options* page looks like:
+
+<img width="990" alt="image" src="https://user-images.githubusercontent.com/37097379/171541034-1f2b6630-acfb-4ebb-b535-2b68f54a0aa4.png">
 
 Now, any text that matches the regular expressions will be highlighted as though they were links in *Live Preview* mode, and clicking on the text will open the link in a browser.
 
@@ -40,8 +41,8 @@ You can have multiple regex-link entries. Each one is applied independently.
 ### Default Link Patterns
 By default, the plugin starts with two entries as examples:
 
-1. `g/<text>` will link to `http://google.com/search?q=<text>`
-2. `@<name>` will link to `http://twitter.com/<name>`
+1. Text matching `g\/([a-zA-Z.-]*)` will link to `http://google.com/search?q=$1`, e.g. "g/obsidian" will search for "obsidian" on Google.
+2. Text matching `@([a-zA-Z]*)` will link to `http://twitter.com/$1`, e.g. "@obsdmd" will open the Obsidian Twitter page.
 
 ### Delete a Link Pattern
 You can delete an entry by clicking on the trash can icon to the right of the entry.
