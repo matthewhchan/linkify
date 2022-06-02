@@ -80,12 +80,10 @@ export default class Linkify extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	// Unregisters any existing LinkifyPlugins and registers new ones constructed from the rules.
+	// Creates new LinkifyViewPlugins and registers them.
 	refreshExtensions() {
-		// Note: unregisterEditorExtension is not part of the public Obsidian API.
-		this.viewPlugins.forEach((plugin) => { (<any>this.app.workspace).unregisterEditorExtension(plugin); });
 		this.viewPlugins = this.settings.rules.map(createViewPlugin);
-		this.viewPlugins.forEach((plugin) => { this.registerEditorExtension(plugin); });
+		this.registerEditorExtension(this.viewPlugins)
 	}
 
 	// Opens linkified text as a link.
