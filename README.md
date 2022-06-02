@@ -1,7 +1,7 @@
 # Linkify
 This plugin converts text into links based on regular expressions. It will highlight matching text the same way links are and when you click on them, it will open a browser and take you to the URL.
 
-For example, you could make all text that is formatted like a Twitter handle, e.g. `@obsdmd`, link to the corresponding Twitter profile.
+For example, you could make all text that is formatted like a Twitter handle become a link to the corresponding Twitter profile.
 
 <img width="718" alt="image" src="https://user-images.githubusercontent.com/37097379/171535251-9c33087f-8f25-4a4e-8907-b819b61b6262.png">
 
