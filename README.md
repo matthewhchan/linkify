@@ -30,7 +30,7 @@ To add a link pattern:
 
 Here's what the Linkify *Options* page looks like:
 
-<img width="992" alt="image" src="https://user-images.githubusercontent.com/37097379/171542591-e86c5c17-b2e2-4856-8ab2-1e50062082ed.png">
+<img width="757" alt="image" src="https://user-images.githubusercontent.com/37097379/171923315-dfad2313-1aa9-49c3-8662-2529ee90bc40.png">
 
 Now, any text that matches the regular expressions will be highlighted as though they were links in *Live Preview* mode, and clicking on the text will open the link in a browser.
 
