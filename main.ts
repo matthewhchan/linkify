@@ -61,6 +61,7 @@ export default class Linkify extends Plugin {
 		this.addSettingTab(new LinkifySettingTab(this.app, this));
 
 		// Linkify Live Preview mode.
+		this.registerEditorExtension(this.viewPlugins);
 		this.refreshExtensions();
 
 		// Linkify Reading mode.
@@ -82,8 +83,8 @@ export default class Linkify extends Plugin {
 
 	// Creates new LinkifyViewPlugins and registers them.
 	refreshExtensions() {
-		this.viewPlugins = this.settings.rules.map(createViewPlugin);
-		this.registerEditorExtension(this.viewPlugins)
+		this.viewPlugins.splice(0, this.viewPlugins.length, ... this.settings.rules.map(createViewPlugin));
+		this.app.workspace.updateOptions()
 	}
 
 	// Opens linkified text as a link.
