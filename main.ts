@@ -19,15 +19,15 @@ type LinkifyViewPlugin = ViewPlugin<{
 const DEFAULT_SETTINGS: LinkifySettings = {
 	rules: [
 		{
-			regexp: "g:([a-zA-Z.-]*)",
+			regexp: "g:([a-zA-Z0-9.-]*)",
 			link: "http://google.com/search?q=$1",
 		},
 		{
-			regexp: "gh:([a-zA-Z.-/]*)",
+			regexp: "gh:([a-zA-Z0-9./-]*)",
 			link: "http://github.com/$1",
 		},
 		{
-			regexp: "@([a-zA-Z]*)",
+			regexp: "@([a-zA-Z0-9]*)",
 			link: "http://twitter.com/$1",
 		},
 	]
