@@ -44,6 +44,6 @@ You can delete an entry by clicking on the trash can icon to the right of the en
 ### Default Link Patterns
 By default, the plugin starts with three example entries:
 
-1. Text matching `g:([a-zA-Z.-]*)` will link to `http://google.com/search?q=$1`, e.g. clicking on "g:obsidian" will search for "obsidian" on Google.
-2. Text matching `gh:([a-zA-Z.-/]*)`will link to `http://github.com/$1`, e.g. clicking on "gh:obsidianmd/obsidian-releases" will open the `obsidianmd/obsidian-releases` Github page.
-3. Text matching `@([a-zA-Z]*)` will link to `http://twitter.com/$1`, e.g. clicking on "@obsdmd" will open the Obsidian Twitter page.
+1. Text matching `g:([a-zA-Z0-9.-]*)` will link to `http://google.com/search?q=$1`, e.g. clicking on "g:obsidian" will search for "obsidian" on Google.
+2. Text matching `gh:([a-zA-Z0-9.-/]*)`will link to `http://github.com/$1`, e.g. clicking on "gh:obsidianmd/obsidian-releases" will open the `obsidianmd/obsidian-releases` Github page.
+3. Text matching `@([a-zA-Z0-9]*)` will link to `http://twitter.com/$1`, e.g. clicking on "@obsdmd" will open the Obsidian Twitter page.
