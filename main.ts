@@ -177,16 +177,16 @@ class LinkifySettingTab extends PluginSettingTab {
 			new Setting(containerEl)
 				.setDesc("RegExp/Link")
 				.addText(text => {
-					text.setValue(rule.regexp)
+					text.setValue(this.plugin.settings.rules[index].regexp)
 					text.inputEl.onblur = async () => {
-						rule.regexp = text.getValue();
+						this.plugin.settings.rules[index].regexp = text.getValue();
 						await this.plugin.saveSettings();
 					};
 				})
 				.addText(text => {
-					text.setValue(rule.link);
+					text.setValue(this.plugin.settings.rules[index].link);
 					text.inputEl.onblur = async () => {
-						rule.link = text.getValue();
+						this.plugin.settings.rules[index].link = text.getValue();
 						await this.plugin.saveSettings();
 					};
 				})
