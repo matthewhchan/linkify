@@ -88,7 +88,7 @@ export default class Linkify extends Plugin {
 	// Creates new LinkifyViewPlugins and registers them.
 	refreshExtensions() {
 		this.viewPlugins.splice(0, this.viewPlugins.length, ... this.settings.rules.map(createViewPlugin));
-		this.app.workspace.updateOptions()
+		this.app.workspace.updateOptions();
 	}
 
 	// Opens linkified text as a link.
@@ -204,7 +204,7 @@ class LinkifySettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.addButton((button) => button
 				.setButtonText("Add New Link").onClick(async () => {
-					this.plugin.settings.rules.push(DEFAULT_NEW_RULE);
+					this.plugin.settings.rules.push({... DEFAULT_NEW_RULE});
 					await this.plugin.saveSettings();
 					this.display();
 				}));
