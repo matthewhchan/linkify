@@ -38,6 +38,9 @@ For example, if the regular expression is `@(\w+)` and the link pattern is `http
 
 You can have multiple regex-link entries. Each one is applied independently.
 
+### Custom Styling For a Link Pattern
+By default, links will have the `linkified` CSS class applied to them. You can add additional classes based on the pattern by adding them to the "CSS Class" field.
+
 ### Delete a Link Pattern
 You can delete an entry by clicking on the trash can icon to the right of the entry.
 

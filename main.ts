@@ -5,6 +5,7 @@ import { RangeSet } from "@codemirror/rangeset";
 interface LinkifyRule {
 	regexp: string,
 	link: string,
+	cssclass: string,
 }
 
 interface LinkifySettings {
@@ -21,14 +22,17 @@ const DEFAULT_SETTINGS: LinkifySettings = {
 		{
 			regexp: "g:([a-zA-Z0-9.-]*)",
 			link: "http://google.com/search?q=$1",
+			cssclass: ""
 		},
 		{
 			regexp: "gh:([a-zA-Z0-9./-]*)",
 			link: "http://github.com/$1",
+			cssclass: "",
 		},
 		{
 			regexp: "@([a-zA-Z0-9]*)",
 			link: "http://twitter.com/$1",
+			cssclass: "",
 		},
 	]
 }
@@ -42,7 +46,7 @@ const DEFAULT_NEW_RULE = {
 function createViewPlugin(rule: LinkifyRule): LinkifyViewPlugin {
 	let decorator = new MatchDecorator({
 		regexp: new RegExp(rule.regexp, "g"),
-		decoration: Decoration.mark({ class: "cm-link linkified" }),
+		decoration: Decoration.mark({ class: `cm-link linkified ${rule.cssclass}` }),
 	});
 	return ViewPlugin.define(view => ({
 		decorations: decorator.createDeco(view),
@@ -94,7 +98,7 @@ export default class Linkify extends Plugin {
 	// Opens linkified text as a link.
 	openLink(evt: MouseEvent) {
 		if (evt.target instanceof HTMLSpanElement &&
-			evt.target.className === "cm-link linkified") {
+			evt.target.className.includes("cm-link linkified")) {
 			let m = this.matchRule(evt.target.innerText);
 			if (m != null) {
 				window.open(m.link);
@@ -103,7 +107,7 @@ export default class Linkify extends Plugin {
 	}
 
 	// Returns the RegExp match and link for the given text.
-	matchRule(text: string): { match: RegExpMatchArray, link: string } | null {
+	matchRule(text: string): { match: RegExpMatchArray, link: string, cssclass: string } | null {
 		for (let rule of this.settings.rules) {
 			let regexp = new RegExp(rule.regexp);
 			let m = text.match(regexp);
@@ -111,6 +115,7 @@ export default class Linkify extends Plugin {
 				return {
 					match: m,
 					link: m[0].replace(regexp, rule.link),
+					cssclass: rule.cssclass,
 				}
 			}
 		}
@@ -132,6 +137,7 @@ export default class Linkify extends Plugin {
 		let anchor = document.createElement("a");
 		anchor.textContent = matchedText;
 		anchor.href = m.link;
+		anchor.className = `linkified ${m.cssclass}`;
 		let nodes: (string | Node)[] = [];
 		nodes.push(before);
 		nodes.push(anchor);
@@ -187,6 +193,14 @@ class LinkifySettingTab extends PluginSettingTab {
 					text.setValue(rule.link);
 					text.inputEl.onblur = async () => {
 						rule.link = text.getValue();
+						await this.plugin.saveSettings();
+					};
+				})
+				.addText(text => {
+					text.setValue(rule.cssclass);
+					text.setPlaceholder("CSS Class")
+					text.inputEl.onblur = async () => {
+						rule.cssclass = text.getValue();
 						await this.plugin.saveSettings();
 					};
 				})
