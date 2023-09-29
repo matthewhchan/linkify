@@ -1,6 +1,6 @@
 import { App, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { Decoration, MatchDecorator, ViewPlugin, ViewUpdate } from "@codemirror/view";
-import { RangeSet } from "@codemirror/rangeset";
+import { RangeSet } from "@codemirror/state";
 
 interface LinkifyRule {
 	regexp: string,
@@ -40,6 +40,7 @@ const DEFAULT_SETTINGS: LinkifySettings = {
 const DEFAULT_NEW_RULE = {
 	regexp: "g\\/([a-zA-Z.-]*)",
 	link: "http://google.com/search?q=$1",
+	cssclass: "",
 }
 
 // Creates a ViewPlugin from a LinkifyRule.
