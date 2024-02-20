@@ -102,7 +102,13 @@ export default class Linkify extends Plugin {
 			evt.target.className.includes("cm-link linkified")) {
 			let m = this.matchRule(evt.target.innerText);
 			if (m != null) {
-				window.open(m.link);
+				// try to match internal link
+				const internalLinkMatch = m.link.match(/^\[\[([^|\]]*)(?:\|[^|\]]*)?\]\]$/);
+				if (internalLinkMatch != null) {
+					this.app.workspace.openLinkText(internalLinkMatch.at(1), "");
+				} else {
+					window.open(m.link);
+				}
 			}
 		}
 	}
@@ -149,8 +155,7 @@ export default class Linkify extends Plugin {
 	// Converts matching text in the HTMLElement into links.
 	markdownPostProcessor(el: HTMLElement) {
 		if (el.firstChild instanceof Node) {
-			let walker = document.createTreeWalker(
-				el.firstChild, NodeFilter.SHOW_TEXT, null);
+			let walker = document.createTreeWalker(el.firstChild, NodeFilter.SHOW_TEXT, null);
 			let nodes: Node[] = [];
 			let node: Node;
 			while (node = walker.nextNode()) {
