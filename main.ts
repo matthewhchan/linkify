@@ -43,8 +43,8 @@ const DEFAULT_SETTINGS: LinkifySettings = {
 };
 
 const DEFAULT_NEW_RULE = {
-	regexp: "g\\/([a-zA-Z.-]*)",
-	link: "http://google.com/search?q=$1",
+	regexp: "",
+	link: "",
 	cssclass: "",
 };
 
