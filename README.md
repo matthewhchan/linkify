@@ -1,6 +1,6 @@
 # Linkify
 
-This plugin converts text into links based on regular expressions. The regular expressions and link destinations are configurable on the Options page for the plugin.
+This plugin converts text into links based on regular expressions. The regular expressions and link destinations are configurable on the _Options_ page for the plugin.
 
 For example, you could make social media handles link to the profile page so that `@obsdmd` becomes a link to http://twitter.com/obsdmd:
 
@@ -10,7 +10,7 @@ Or you could make a shortcut for GitHub repos so that `gh:obsidianmd/obsidian-re
 
 <img width="696" alt="Screenshot 2023-09-29 at 3 02 23 PM" src="https://github.com/matthewhchan/linkify/assets/37097379/23b10873-0034-42c6-b9e6-e242d3df8b27">
 
-The text you want to match and the URL you want it to link to are configured on the Options page for the plugin.
+The text you want to match and the URL you want it to link to are configured on the _Options_ page for the plugin.
 
 _Note: The underlying text is not modified. This plugin only changes the appearance and functionality of your notes. It makes no changes to your `.md` files._
 
@@ -20,12 +20,12 @@ _Note: The underlying text is not modified. This plugin only changes the appeara
 
 To add a link pattern:
 
--   Go to the Options page for Linkify.
--   Click on the "Add New Link" button.
+-   Go to the _Options_ page for Linkify.
+-   Click on the _Add New Link_ button.
 -   In the first text box, enter a regular expression.
 -   In the second text box, write the URL you want the text to link to.[^1]
 -   _(Optional)_ Enter a CSS class in the third text box that will also be applied to any matching text.
--   Close the Options page.
+-   Close the _Options_ page.
 
 [^1]: The URL is allowed to include replacement patterns as described in [`String.prototype.replace`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#specifying_a_string_as_a_parameter).
 
@@ -35,7 +35,9 @@ Here's what the Linkify _Options_ page looks like:
 
 Now, any text that matches a regular expression will be highlighted as though it were a link in _Live Preview_ mode, and clicking on the text will open the link in a browser.
 
-For example, if the regular expression is `@(\w+)` and the link pattern is `http://twitter.com/$1`, then any occurrence of `@obsdmd` in your notes will link to http://twitter.com/obsdmd. The same is true for any other name preceded by a `@` symbol.
+For example, if the regular expression is `@(\w+)` and the link pattern is `http://twitter.com/$1`, then any occurrence of `@obsdmd` in your notes will link to http://twitter.com/obsdmd, `@github` will link to http://twitter.com/github, etc.
+
+Links to Obsidian notes, e.g. `[[Journal/$1]]`, are also supported.
 
 You can have multiple regex-link entries. Each one is applied independently.
 
