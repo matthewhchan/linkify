@@ -56,3 +56,11 @@ By default, the plugin starts with three example entries:
 1. Text matching `g:([a-zA-Z0-9.-]*)` will link to `http://google.com/search?q=$1`.
 2. Text matching `gh:([a-zA-Z0-9.-/]*)`will link to `http://github.com/$1`.
 3. Text matching `@([a-zA-Z0-9]*)` will link to `http://twitter.com/$1`.
+
+### Export Rules
+
+To export your rules as a JSON file, click the _Export Rules_ button at the bottom of the Linkify _Options_ page.
+
+### Import Rules
+
+To import rules from a JSON file, click the _Import Rules_ button at the bottom of the _Options_ page and select a `.json` file. Imported rules are added to your existing rules.

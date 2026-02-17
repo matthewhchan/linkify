@@ -1,4 +1,4 @@
-import { App, Plugin, PluginSettingTab, Setting } from "obsidian";
+import { App, Notice, Plugin, PluginSettingTab, Setting } from "obsidian";
 import {
 	Decoration,
 	MatchDecorator,
@@ -263,6 +263,79 @@ class LinkifySettingTab extends PluginSettingTab {
 				this.display();
 			}),
 		);
+
+		const buttonRow = containerEl.createDiv({
+			attr: { style: "display: flex; gap: 8px; margin-top: 16px;" },
+		});
+
+		const exportBtn = buttonRow.createEl("button", {
+			text: "Export Rules",
+		});
+		exportBtn.addEventListener("click", () => {
+			const json = JSON.stringify(
+				{ rules: this.plugin.settings.rules },
+				null,
+				2,
+			);
+			const blob = new Blob([json], { type: "application/json" });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement("a");
+			a.href = url;
+			a.download = "linkify-rules.json";
+			a.click();
+			URL.revokeObjectURL(url);
+		});
+
+		const importBtn = buttonRow.createEl("button", {
+			text: "Import Rules",
+		});
+		importBtn.addEventListener("click", () => {
+			const input = document.createElement("input");
+			input.type = "file";
+			input.accept = ".json";
+			input.onchange = async () => {
+				const file = input.files?.[0];
+				if (!file) return;
+				try {
+					const text = await file.text();
+					const data = JSON.parse(text);
+					const rules: unknown[] = Array.isArray(data)
+						? data
+						: Array.isArray(data?.rules)
+							? data.rules
+							: null;
+					if (!rules) {
+						throw new Error(
+							'Invalid format: expected a JSON object with a "rules" array or a JSON array of rules.',
+						);
+					}
+					for (const rule of rules) {
+						if (
+							typeof rule !== "object" ||
+							rule === null ||
+							typeof (rule as LinkifyRule).regexp !==
+								"string" ||
+							typeof (rule as LinkifyRule).link !== "string"
+						) {
+							throw new Error(
+								'Invalid rule: each rule must have "regexp" and "link" string fields.',
+							);
+						}
+					}
+					const validRules = rules.map((r) => ({
+						regexp: (r as LinkifyRule).regexp,
+						link: (r as LinkifyRule).link,
+						cssclass: (r as LinkifyRule).cssclass || "",
+					}));
+					this.plugin.settings.rules.push(...validRules);
+					await this.plugin.saveSettings();
+					this.display();
+				} catch (e) {
+					new Notice(`Failed to import rules: ${e.message}`);
+				}
+			};
+			input.click();
+		});
 	}
 
 	hide() {
