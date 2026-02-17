@@ -49,24 +49,36 @@ const DEFAULT_NEW_RULE = {
 };
 
 // Creates a ViewPlugin from a LinkifyRule.
-function createViewPlugin(rule: LinkifyRule): LinkifyViewPlugin {
-	let decorator = new MatchDecorator({
-		regexp: new RegExp(rule.regexp, "g"),
-		decoration: Decoration.mark({
-			class: `cm-link linkified ${rule.cssclass}`,
-		}),
-	});
-	return ViewPlugin.define(
-		(view) => ({
-			decorations: decorator.createDeco(view),
-			update(u) {
-				this.decorations = decorator.updateDeco(u, this.decorations);
+// Returns null if the rule's regexp is invalid.
+function createViewPlugin(rule: LinkifyRule): LinkifyViewPlugin | null {
+	try {
+		let decorator = new MatchDecorator({
+			regexp: new RegExp(rule.regexp, "g"),
+			decoration: Decoration.mark({
+				class: `cm-link linkified ${rule.cssclass}`,
+			}),
+		});
+		return ViewPlugin.define(
+			(view) => ({
+				decorations: decorator.createDeco(view),
+				update(u) {
+					this.decorations = decorator.updateDeco(
+						u,
+						this.decorations,
+					);
+				},
+			}),
+			{
+				decorations: (v) => v.decorations,
 			},
-		}),
-		{
-			decorations: (v) => v.decorations,
-		},
-	);
+		);
+	} catch (e) {
+		console.warn(
+			`Linkify: Skipping invalid regexp "${rule.regexp}":`,
+			e.message,
+		);
+		return null;
+	}
 }
 
 export default class Linkify extends Plugin {
@@ -110,11 +122,10 @@ export default class Linkify extends Plugin {
 
 	// Creates new LinkifyViewPlugins and registers them.
 	refreshExtensions() {
-		this.viewPlugins.splice(
-			0,
-			this.viewPlugins.length,
-			...this.settings.rules.map(createViewPlugin),
-		);
+		const plugins = this.settings.rules
+			.map(createViewPlugin)
+			.filter((p): p is LinkifyViewPlugin => p !== null);
+		this.viewPlugins.splice(0, this.viewPlugins.length, ...plugins);
 		this.app.workspace.updateOptions();
 	}
 
@@ -147,14 +158,22 @@ export default class Linkify extends Plugin {
 		text: string,
 	): { match: RegExpMatchArray; link: string; cssclass: string } | null {
 		for (let rule of this.settings.rules) {
-			let regexp = new RegExp(rule.regexp);
-			let m = text.match(regexp);
-			if (m != null) {
-				return {
-					match: m,
-					link: m[0].replace(regexp, rule.link),
-					cssclass: rule.cssclass,
-				};
+			try {
+				let regexp = new RegExp(rule.regexp);
+				let m = text.match(regexp);
+				if (m != null) {
+					return {
+						match: m,
+						link: m[0].replace(regexp, rule.link),
+						cssclass: rule.cssclass,
+					};
+				}
+			} catch (e) {
+				console.warn(
+					`Linkify: Skipping invalid regexp "${rule.regexp}":`,
+					e.message,
+				);
+				continue;
 			}
 		}
 
@@ -313,8 +332,7 @@ class LinkifySettingTab extends PluginSettingTab {
 						if (
 							typeof rule !== "object" ||
 							rule === null ||
-							typeof (rule as LinkifyRule).regexp !==
-								"string" ||
+							typeof (rule as LinkifyRule).regexp !== "string" ||
 							typeof (rule as LinkifyRule).link !== "string"
 						) {
 							throw new Error(
