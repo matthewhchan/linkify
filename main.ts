@@ -275,16 +275,22 @@ class LinkifySettingTab extends PluginSettingTab {
 				});
 		}
 
-		new Setting(containerEl).addButton((button) =>
-			button.setButtonText("Add New Link").onClick(async () => {
-				this.plugin.settings.rules.push({ ...DEFAULT_NEW_RULE });
-				await this.plugin.saveSettings();
-				this.display();
-			}),
-		);
+		const addBtnRow = containerEl.createDiv({
+			attr: { style: "margin-top: 16px;" },
+		});
+		const addBtn = addBtnRow.createEl("button", {
+			text: "Add New Link",
+		});
+		addBtn.addEventListener("click", async () => {
+			this.plugin.settings.rules.push({ ...DEFAULT_NEW_RULE });
+			await this.plugin.saveSettings();
+			this.display();
+		});
+
+		containerEl.createEl("hr");
 
 		const buttonRow = containerEl.createDiv({
-			attr: { style: "display: flex; gap: 8px; margin-top: 16px;" },
+			attr: { style: "display: flex; gap: 8px;" },
 		});
 
 		const exportBtn = buttonRow.createEl("button", {
